@@ -1,0 +1,169 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <limits> 
+
+using namespace std;
+
+struct Book
+{
+    string id;
+    string title;
+    string author;
+    string status;
+};
+
+vector<Book> library;
+
+Book* findBook(const string &id)
+{
+    for (auto &book : library)
+    {
+        if (book.id == id)
+            return &book;
+    }
+    return nullptr;
+}
+
+void addBook()
+{
+    string id, title, author;
+
+    do {
+        cout << "Enter Book ID: ";
+        cin >> id;
+        if (id.empty()) {
+            cout << "Book ID cannot be empty!\n";
+        }
+    } while (id.empty());
+
+    if (findBook(id))
+    {
+        cout << "Book with this ID already exists!\n";
+        return;
+    }
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+
+    do {
+        cout << "Enter Title: ";
+        getline(cin, title);
+        if (title.empty()) {
+            cout << "Title cannot be empty!\n";
+        }
+    } while (title.empty());
+
+    do {
+        cout << "Enter Author: ";
+        getline(cin, author);
+        if (author.empty()) {
+            cout << "Author cannot be empty!\n";
+        }
+    } while (author.empty());
+
+    library.push_back({id, title, author, "Available"});
+    cout << "Book added successfully!\n";
+}
+
+void displayBooks()
+{
+    bool found = false;
+    cout << "\n--- Available Library Books ---\n";
+
+    for (auto &b : library)
+    {
+        if (b.status == "Available"){
+            cout << b.id << " | " << b.title << " | " << b.author << " | " << b.status << "\n";
+            found = true;
+        }
+    }
+
+    if (!found)
+    {
+        cout << "No available books in library.\n";
+    }
+}
+
+void issueBook()
+{
+    string id;
+    cout << "Enter Book ID to issue: ";
+    cin >> id;
+
+    if (id.empty()) {
+        cout << "Book ID cannot be empty!\n";
+        return;
+    }
+
+    Book *book = findBook(id);
+    if (!book)
+    {
+        cout << "Book not found!\n";
+        return;
+    }
+    if (book->status == "Issued")
+    {
+        cout << "Book already issued!\n";
+        return;
+    }
+    book->status = "Issued";
+    cout << "Book issued!\n";
+}
+
+void returnBook()
+{
+    string id;
+    cout << "Enter Book ID to return: ";
+    cin >> id;
+
+    if (id.empty()) {
+        cout << "Book ID cannot be empty!\n";
+        return;
+    }
+
+    Book *book = findBook(id);
+    if (!book)
+    {
+        cout << "Book not found!\n";
+        return;
+    }
+    if (book->status == "Available")
+    {
+        cout << "Book was not issued!\n";
+        return;
+    }
+    book->status = "Available";
+    cout << "Book returned!\n";
+}
+
+void menu()
+{
+    int choice;
+    do
+    {
+        cout << "\n--- Library Menu ---\n";
+        cout << "1. Add Book\n";
+        cout << "2. Display Books\n";
+        cout << "3. Issue Book\n";
+        cout << "4. Return Book\n";
+        cout << "5. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+            case 1: addBook(); break;
+            case 2: displayBooks(); break;
+            case 3: issueBook(); break;
+            case 4: returnBook(); break;
+            case 5: cout << "Goodbye!\n"; break;
+            default: cout << "Invalid choice! Please try again.\n";
+        }
+    } while (choice != 5);
+}
+
+int main()
+{
+    menu();
+    return 0;
+}
